@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Christmas for My Love</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --apple-red: #ff3b30;
+            --apple-gold: #FFD60A;
+            --apple-green: #34C759;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 每一屏的容器 */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* 第一屏：开场标题 - 苹果风格 */
+        .hero-section {
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #000 70%);
+        }
+
+        .hero-section .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        /* 第二屏：树的预告文字 */
+        .tree-intro-section {
+            background: radial-gradient(ellipse at center, #0a1a0a 0%, #000 60%);
+        }
+
+        .tree-intro-section .tree-intro-title {
+            font-size: clamp(2.2rem, 6vw, 3.8rem);
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #34C759 0%, #248A3D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 第三屏：圣诞树展示 */
+        .tree-section {
+            position: relative;
+            background: transparent;
+            z-index: 1;
+        }
+
+        canvas {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 第四屏：礼物预告 - Apple 发布会风格，苹果红色主题 */
+        .gift-reveal-section {
+            background: linear-gradient(180deg, #000 0%, #0a0000 50%, #000 100%);
+            z-index: 2;
+        }
+
+        .gift-reveal-section .hero-title {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            /* 改为苹果红色渐变 */
+            background: linear-gradient(135deg, #ff3b30 0%, #ff6b5e 50%, #ff3b30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        /* 第五屏：礼物展示 - Apple 产品展示风格 */
+        .gift-section {
+            background: linear-gradient(180deg, #0a0000 0%, #000 100%);
+            gap: 40px;
+            z-index: 2;
+            min-height: 100vh;
+            padding-bottom: 60px; /* 给底部留出空间 */
+        }
+
+        .gift-image {
+            max-width: 600px;
+            width: 85%;
+            height: auto;
+            border-radius: 40px;
+            box-shadow:
+                    0 30px 90px rgba(255, 215, 0, 0.25),
+                    0 10px 40px rgba(255, 59, 48, 0.15),
+                    0 0 60px rgba(255, 214, 10, 0.1);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gift-text {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #fff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            text-shadow:
+                    0 2px 20px rgba(255, 214, 10, 0.4),
+                    0 0 40px rgba(255, 59, 48, 0.2);
+        }
+
+        /* 引导滑动指示器 - Apple 风格 */
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            opacity: 0.4;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            animation: bounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            z-index: 10;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-12px); }
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .gift-image {
+                border-radius: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 第一屏：开场 -->
+<section class="hero-section">
+    <h1 class="hero-title" id="title1">这是一个<br>属于我们的网站</h1>
+    <div class="scroll-hint">向上滑动开启节日</div>
+</section>
+
+<!-- 第二屏：树的预告 -->
+<section class="tree-intro-section">
+    <h1 class="tree-intro-title" id="treeIntroTitle">为你种下一棵树</h1>
+    <div class="scroll-hint">向上滑动见证成长</div>
+</section>
+
+<!-- 第三屏：圣诞树展示 -->
+<section class="tree-section">
+</section>
+
+<!-- 第四屏：礼物预告 -->
+<section class="gift-reveal-section">
+    <h1 class="hero-title" id="title2">今年，圣诞老人<br>送给你的礼物是...</h1>
+    <div class="scroll-hint">继续向上</div>
+</section>
+
+<!-- 第五屏：礼物展示（最后一屏）-->
+<section class="gift-section">
+    <img src="./images/melody.jpg" alt="美乐蒂小夜灯" class="gift-image" id="giftImage">
+    <p class="gift-text" id="giftText">美乐蒂小夜灯</p>
+</section>
+
+<canvas id="treeCanvas"></canvas>
+
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ===== Apple 风格滚动动画 =====
+
+    // 第一屏：标题优雅淡出
+    gsap.to("#title1", {
+        scrollTrigger: {
+            trigger: ".hero-section",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.5,
+        },
+        scale: 0.85,
+        opacity: 0,
+        y: -80,
+        ease: "power2.out"
+    });
+
+    // 第二屏：树的预告文字入场
+    gsap.fromTo("#treeIntroTitle",
+        {
+            opacity: 0,
+            y: 60,
+            scale: 0.9
+        },
+        {
+            scrollTrigger: {
+                trigger: ".tree-intro-section",
+                start: "top bottom",
+                end: "center center",
+                scrub: 1.8,
+            },
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "power3.out"
+        }
+    );
+
+    // 第二屏：树的预告文字退场
+    gsap.to("#treeIntroTitle", {
+        scrollTrigger: {
+            trigger: ".tree-intro-section",
+            start: "center top",
+            end: "bottom top",
+            scrub: 1.5,
+        },
+        opacity: 0,
+        y: -50,
+        scale: 0.95,
+        ease: "power2.in"
+    });
+
+    // 第三屏：圣诞树Canvas丝滑入场
+    gsap.fromTo("#treeCanvas",
+        {
+            scale: 0.3,
+            opacity: 0,
+            filter: "blur(30px)"
+        },
+        {
+            scrollTrigger: {
+                trigger: ".tree-section",
+                start: "top bottom",
+                end: "center center",
+                scrub: 2.5, // 更平滑的入场
+            },
+            scale: 1,
+            opacity: 1,
+            filter: "blur(0px)",
+            ease: "power4.out"
+        }
+    );
+
+    // 第三屏：圣诞树Canvas超级丝滑退场（优化版）
+    gsap.to("#treeCanvas", {
+        scrollTrigger: {
+            trigger: ".tree-section",
+            start: "60% top", // 提前开始退场
+            end: "bottom top",
+            scrub: 3.5, // 增加scrub值让退场更柔和
+        },
+        scale: 0.5, // 缩小更多
+        opacity: 0,
+        filter: "blur(25px)", // 更强的模糊效果
+        y: -150, // 向上飘走更多
+        ease: "power4.inOut" // 使用power4缓动函数更柔和
+    });
+
+    // 第四屏：礼物预告入场（延迟一点，让树完全退场）
+    gsap.fromTo("#title2",
+        {
+            opacity: 0,
+            y: 100,
+            scale: 0.9
+        },
+        {
+            scrollTrigger: {
+                trigger: ".gift-reveal-section",
+                start: "top 80%", // 稍晚开始
+                end: "center center",
+                scrub: 2,
+            },
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "power3.out"
+        }
+    );
+
+    // 第四屏：礼物预告退场
+    gsap.to("#title2", {
+        scrollTrigger: {
+            trigger: ".gift-reveal-section",
+            start: "center top",
+            end: "bottom top",
+            scrub: 1.5,
+        },
+        opacity: 0,
+        y: -60,
+        scale: 0.95,
+        ease: "power2.in"
+    });
+
+    // 第五屏：礼物整体入场
+    gsap.fromTo(".gift-section",
+        {
+            opacity: 0
+        },
+        {
+            scrollTrigger: {
+                trigger: ".gift-section",
+                start: "top bottom",
+                end: "center center",
+                scrub: 1.5,
+            },
+            opacity: 1,
+            ease: "power2.out"
+        }
+    );
+
+    // 第五屏：礼物图片 - Apple 产品展示风格
+    gsap.fromTo("#giftImage",
+        {
+            scale: 0.7,
+            opacity: 0,
+            y: 60
+        },
+        {
+            scrollTrigger: {
+                trigger: ".gift-section",
+                start: "top bottom",
+                end: "center center",
+                scrub: 2,
+            },
+            scale: 1,
+            opacity: 1,
+            y: 0,
+            ease: "power3.out"
+        }
+    );
+
+    // 第五屏：礼物文字延迟入场
+    gsap.fromTo("#giftText",
+        {
+            y: 40,
+            opacity: 0
+        },
+        {
+            scrollTrigger: {
+                trigger: ".gift-section",
+                start: "20% bottom",
+                end: "center center",
+                scrub: 1.8,
+            },
+            y: 0,
+            opacity: 1,
+            ease: "power2.out"
+        }
+    );
+
+    // ===== 圣诞树绘制逻辑（原始版本）=====
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    const particleCount = 1000;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() {
+            this.reset();
+            this.y = Math.random() * height;
+        }
+
+        reset() {
+            this.x = Math.random() * width;
+            this.y = -10;
+            this.speed = Math.random() * 2 + 1;
+            this.size = Math.random() * 2 + 0.5;
+            this.drift = Math.random() * 2 - 1;
+            this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        update() {
+            this.y += this.speed;
+            this.x += this.drift;
+            if (this.y > height) {
+                this.reset();
+            }
+        }
+
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    const treeParticles = [];
+    const treeHeight = 400;
+    const baseRadius = 180;
+    const treeLayers = 2000;
+
+    for (let i = 0; i < treeLayers; i++) {
+        treeParticles.push({
+            y: (i / treeLayers),
+            angle: i * 0.5,
+            offset: Math.random() * 5,
+            color: Math.random() > 0.9 ? '#ff3333' : (Math.random() > 0.8 ? '#ffff33' : '#0f8')
+        });
+    }
+
+    const candyCanes = [];
+    for (let i = 0; i < 15; i++) {
+        candyCanes.push({
+            y: 0.2 + Math.random() * 0.6,
+            angle: Math.random() * Math.PI * 2,
+            size: 8 + Math.random() * 4
+        });
+    }
+
+    const giftBoxes = [];
+    for (let i = 0; i < 10; i++) {
+        giftBoxes.push({
+            y: 0.3 + Math.random() * 0.5,
+            angle: Math.random() * Math.PI * 2,
+            size: 10 + Math.random() * 5,
+            color: ['#ff3333', '#3333ff', '#ffff33', '#ff69b4'][Math.floor(Math.random() * 4)]
+        });
+    }
+
+    let rotationSpeed = 0;
+
+    function drawTree() {
+        const centerX = width / 2;
+        const centerY = height / 2 + 100;
+
+        rotationSpeed += 0.01;
+
+        treeParticles.forEach(p => {
+            const currentY = p.y * treeHeight;
+            const radius = baseRadius * (1 - p.y);
+
+            const angle = p.angle + rotationSpeed;
+            const x = centerX + Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = centerY - currentY;
+
+            const scale = (z + 200) / 300;
+            const size = (Math.random() * 2 + 1) * scale;
+            const alpha = (z + 150) / 300;
+
+            if (alpha > 0) {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        });
+
+        // 画顶部的星星
+        const starX = centerX;
+        const starY = centerY - treeHeight - 20;
+
+        ctx.save();
+        ctx.translate(starX, starY);
+
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = "#ffff33";
+
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const outerAngle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+            const innerAngle = ((i * 2 + 1) * Math.PI / 5) - Math.PI / 2;
+            const outerX = Math.cos(outerAngle) * 15;
+            const outerY = Math.sin(outerAngle) * 15;
+            const innerX = Math.cos(innerAngle) * 6;
+            const innerY = Math.sin(innerAngle) * 6;
+
+            if (i === 0) ctx.moveTo(outerX, outerY);
+            else ctx.lineTo(outerX, outerY);
+            ctx.lineTo(innerX, innerY);
+        }
+        ctx.closePath();
+
+        const starGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
+        starGradient.addColorStop(0, '#ffffaa');
+        starGradient.addColorStop(0.5, '#ffff33');
+        starGradient.addColorStop(1, '#ffaa00');
+        ctx.fillStyle = starGradient;
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.restore();
+
+        // 绘制糖果棍
+        candyCanes.forEach(candy => {
+            const currentY = candy.y * treeHeight;
+            const radius = baseRadius * (1 - candy.y);
+
+            const angle = candy.angle + rotationSpeed;
+            const x = centerX + Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = centerY - currentY;
+
+            const scale = (z + 200) / 300;
+            const alpha = (z + 150) / 300;
+
+            if (alpha > 0 && scale > 0.3) {
+                ctx.globalAlpha = alpha;
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(Math.PI / 4);
+
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(-2 * scale, -candy.size * scale, 4 * scale, candy.size * scale);
+
+                ctx.fillStyle = '#ff3333';
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillRect(-2 * scale, (-candy.size + i * 3) * scale, 4 * scale, 1.5 * scale);
+                }
+
+                ctx.beginPath();
+                ctx.arc(0, -candy.size * scale, 3 * scale, Math.PI, 0);
+                ctx.strokeStyle = '#ff3333';
+                ctx.lineWidth = 3 * scale;
+                ctx.stroke();
+
+                ctx.restore();
+                ctx.globalAlpha = 1;
+            }
+        });
+
+        // 绘制礼物盒
+        giftBoxes.forEach(gift => {
+            const currentY = gift.y * treeHeight;
+            const radius = baseRadius * (1 - gift.y);
+
+            const angle = gift.angle + rotationSpeed;
+            const x = centerX + Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = centerY - currentY;
+
+            const scale = (z + 200) / 300;
+            const alpha = (z + 150) / 300;
+
+            if (alpha > 0 && scale > 0.3) {
+                ctx.globalAlpha = alpha;
+
+                const boxSize = gift.size * scale;
+
+                ctx.fillStyle = gift.color;
+                ctx.fillRect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
+
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(x - boxSize / 2, y - boxSize * 0.1, boxSize, boxSize * 0.2);
+
+                ctx.fillRect(x - boxSize * 0.1, y - boxSize / 2, boxSize * 0.2, boxSize);
+
+                ctx.beginPath();
+                ctx.arc(x - boxSize * 0.25, y - boxSize / 2, boxSize * 0.15, 0, Math.PI * 2);
+                ctx.arc(x + boxSize * 0.25, y - boxSize / 2, boxSize * 0.15, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFD700';
+                ctx.fill();
+
+                ctx.globalAlpha = 1;
+            }
+        });
+
+        // 画树底部的 "Merry Christmas" 文字
+        const textY = centerY + 80;
+
+        ctx.font = '300 56px "Cormorant Garamond", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const gradient = ctx.createLinearGradient(centerX, textY - 30, centerX, textY + 30);
+        gradient.addColorStop(0, '#FFF9E6');
+        gradient.addColorStop(0.5, '#FFE89F');
+        gradient.addColorStop(1, '#D4AF37');
+
+        ctx.fillStyle = gradient;
+        ctx.fillText('Merry Christmas', centerX, textY);
+
+        ctx.shadowBlur = 0;
+    }
+
+    for (let i = 0; i < 150; i++) {
+        particles.push(new Particle());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        drawTree();
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+</body>
+</html>
